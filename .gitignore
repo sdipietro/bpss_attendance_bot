@@ -1,0 +1,5 @@
+credentials.js
+.DS_Store
+node_modules/
+google_creds.json
+package-lock.json
