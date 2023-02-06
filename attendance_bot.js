@@ -3,7 +3,9 @@ const puppeteer = require('puppeteer');
 const { google } = require("googleapis");
 const path = require('path');
 
-const progressTrackerAttendanceUrl = credentials.attendanceUrl;
+const progressTrackerAttendanceUrl = 'https://progress.appacademy.io/attendances';
+const progressTrackerEmail = credentials.aAemail;
+const progressTrackerPassword = credentials.aApassword;
 
 async function loginPT(page) {
     console.log('Visiting Progress Tracker...');
