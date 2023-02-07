@@ -12,8 +12,8 @@ async function loginPT(page) {
     // await page.authenticate({username: credentials.aAemail, password: credentials.aApassword});
     await page.goto(progressTrackerAttendanceUrl);
     console.log('Logging into Progress Tracker...');
-    await page.type('[id=instructor_email]', credentials.aAemail);
-    await page.type('[id=instructor_password]', credentials.aApassword);
+    await page.type('[id=instructor_email]', progressTrackerEmail);
+    await page.type('[id=instructor_password]', progressTrackerPassword);
     await page.keyboard.press('Enter',{delay:5000});
     return page;
 }
