@@ -3,18 +3,20 @@ const puppeteer = require('puppeteer');
 const { google } = require("googleapis");
 const path = require('path');
 
-const progressTrackerAttendanceUrl = 'https://progress.appacademy.io/attendances';
+const progressTrackerAttendanceUrl = credentials.attendanceUrl;
 const progressTrackerEmail = credentials.aAemail;
 const progressTrackerPassword = credentials.aApassword;
 
 async function loginPT(page) {
     console.log('Visiting Progress Tracker...');
-    // await page.authenticate({username: credentials.aAemail, password: credentials.aApassword});
     await page.goto(progressTrackerAttendanceUrl);
     console.log('Logging into Progress Tracker...');
     await page.type('[id=instructor_email]', progressTrackerEmail);
     await page.type('[id=instructor_password]', progressTrackerPassword);
-    await page.keyboard.press('Enter',{delay:5000});
+    await page.keyboard.press('Enter');
+    await page.waitForNavigation({
+        waitUntil: 'networkidle0'
+    })
     return page;
 }
 
@@ -101,7 +103,7 @@ async function inputBPSS(attendanceData) {
     const client = await auth.getClient();
     const googleSheets = google.sheets({ version: "v4", auth: client });
     const spreadsheetId = "1DAy53KtQw95bZ5DqgpnEJq7fnDJT5O3RC_F0jfiIz-g";
-    let week = Object.keys(attendanceData)[0][1];
+    let week = Object.keys(attendanceData)[0].split('d')[0].split('w')[1];
     let sheetNumber;
 
     switch (week) {
@@ -141,7 +143,7 @@ async function inputBPSS(attendanceData) {
             console.log('Error: wrong week number.');
     }
 
-    let day = Object.keys(attendanceData)[0][3];
+    let day = Object.keys(attendanceData)[0].split('d')[1];
     let startingCol;
 
     switch (true) {
