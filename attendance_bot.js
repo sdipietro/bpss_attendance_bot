@@ -3,11 +3,11 @@ const puppeteer = require('puppeteer');
 const { google } = require("googleapis");
 const path = require('path');
 
-const progressTrackerAttendanceUrl = credentials.attendanceUrl;
 const progressTrackerEmail = credentials.aAemail;
 const progressTrackerPassword = credentials.aApassword;
 
-async function loginPT(page) {
+async function loginPT(page, cohortNumber) {
+    const progressTrackerAttendanceUrl = `https://progress.appacademy.io/cycles/${cohortNumber}/attendances`;
     console.log('Visiting Progress Tracker...');
     await page.goto(progressTrackerAttendanceUrl);
     console.log('Logging into Progress Tracker...');
@@ -93,7 +93,7 @@ async function checkMorningLunchAfternoon(page) {
 //     return page;
 // }
 
-async function inputBPSS(attendanceData) {
+async function inputBPSS(attendanceData, spreadsheetId) {
     console.log('Inputting attendance in google sheets...')
     const auth = new google.auth.GoogleAuth({
         keyFile: path.join(__dirname, "google_creds.json"),
@@ -102,7 +102,7 @@ async function inputBPSS(attendanceData) {
 
     const client = await auth.getClient();
     const googleSheets = google.sheets({ version: "v4", auth: client });
-    const spreadsheetId = "1DAy53KtQw95bZ5DqgpnEJq7fnDJT5O3RC_F0jfiIz-g";
+    // const spreadsheetId = "1DAy53KtQw95bZ5DqgpnEJq7fnDJT5O3RC_F0jfiIz-g";
     let week = Object.keys(attendanceData)[0].split('d')[0].split('w')[1];
     let sheetNumber;
 
@@ -213,17 +213,18 @@ async function inputBPSS(attendanceData) {
     });
 }
 
-async function updateAttendance(){
+async function updateAttendance(cohortNumber, googleSheetsId){
     console.log('Opening Virtual Browser...');
     const browser = await puppeteer.launch({headless: true});
     const page = await browser.newPage();
-    const loggedInPT = await loginPT(page);
+    const loggedInPT = await loginPT(page, cohortNumber);
     const attendanceData = await checkMorningLunchAfternoon(loggedInPT);
     console.log('Closing Virtual Browser...');
     await page.close();
     await browser.close();
-    await inputBPSS(attendanceData);
+    await inputBPSS(attendanceData, googleSheetsId);
     console.log('Done!');
 }
 
-updateAttendance();
+updateAttendance('309', '1DAy53KtQw95bZ5DqgpnEJq7fnDJT5O3RC_F0jfiIz-g');
+updateAttendance('310', '14NWBUaVkakVHFXkJile3srQcZ9UZdPDzZS-wwvX7DQU');
